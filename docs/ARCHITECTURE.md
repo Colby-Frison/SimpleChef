@@ -58,3 +58,28 @@ The system follows a **Client-Server** architecture with a **Layered** approach 
 - **Recipe** (1) <--> (N) **Ingredient**
 - **User** (1) <--> (1) **GroceryList**
 - **GroceryList** (1) <--> (N) **GroceryItem**
+
+## 6. API authorization (ownership pattern)
+
+All mutating endpoints must verify the authenticated user owns the resource (or the resource is scoped to them via a parent row).
+
+- **Recipes**
+  - `GET /recipes/` returns recipes where `created_by_id == current_user.id` **or** `is_public` is true.
+  - `GET /recipes/{id}` returns **404** if the recipe is neither owned by the user nor public (avoid existence leaks).
+  - `POST /recipes/` sets `created_by_id` to the current user; optional `is_public` on the body is honored.
+  - `PUT` / `DELETE /recipes/{id}` require `created_by_id == current_user.id`; otherwise **403**.
+  - Legacy rows with `created_by_id` null are migrated to `is_public = true` so existing demo data stays visible.
+
+- **Grocery items**
+  - `PUT /grocery/items/{id}` loads the item by joining `GroceryItem` → `GroceryList` and filtering `GroceryList.user_id == current_user.id`. Other users get **404** (same shape as “not found”).
+
+**Pattern for new endpoints:** join from the row being updated/deleted up to `user_id` (or equivalent) and compare to `current_user.id` before applying changes. Prefer **404** over **403** for cross-tenant id guesses when the UX should not reveal whether a row exists.
+
+## 7. Cooking data model (mise en place)
+
+- `Ingredient` may reference `Step` via nullable `step_id` (FK). Clients send `step_order_index` on create/update; the API resolves it to `step_id` after steps are persisted.
+- **Display rules (app):** ingredients with no `step_id` appear in mise on **step 1 only** (global prep). Ingredients linked to the current step appear for that step.
+
+## 8. Grocery merge from meal plan
+
+- `POST /grocery/from-plan` loads `MealPlan` rows for the user in `[start_date, end_date]` with a `recipe_id`, expands each recipe’s ingredients, aggregates by normalized `(name, unit)`, sums quantities, assigns a default category from keywords, then **merges** into the user’s `GroceryItem` rows (add quantity when the key exists, else insert). Manual-only lines are untouched unless they share the same normalized key.

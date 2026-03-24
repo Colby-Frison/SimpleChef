@@ -57,9 +57,29 @@ A smart cooking assistant app.
    ```
    Scan the QR code with Expo Go app or press `a` for Android emulator / `w` for Web.
 
-## Features implemented
-- **User Auth**: Login/Signup.
-- **Recipes**: Browse, Search, Add (Manual + AI Text Paste), Details.
-- **Cooking Mode**: Step-by-step instructions with integrated timers.
-- **Meal Planner**: Calendar view to plan meals.
-- **Grocery List**: Auto-generated from plan or manual add.
+## Environment variables
+
+- **Backend:** `DATABASE_URL` or `POSTGRES_*` (see `backend/app/core/config.py`), `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`.
+- **Frontend:** `EXPO_PUBLIC_API_URL` — full API base including `/api/v1` (e.g. `http://192.168.1.5:8000/api/v1` for a device on LAN).
+
+## Tests and seed data
+
+- **Pytest** (from `backend/`): `pip install -r requirements.txt` then `pytest tests/`.
+- **Demo seed** (from `backend/` after migrations): `python -m scripts.seed_demo` — creates `demo@simplechef.local` / `demo12345` and a sample recipe.
+
+## Known limitations
+
+- Recipe parse is a **demo** (no production LLM). URL paste is rejected; use plain text.
+- **Friends/social** is out of scope; see `CONTINUATION_CHECKLIST.md`.
+- `frontend/app/(tabs)/explore.tsx` is leftover starter code and is not in the tab bar.
+
+## Features implemented (high level)
+
+- **Auth:** Login/signup, JWT, safe 401 handling on the client.
+- **Recipes:** Owner/public visibility, search/filter/tags, grid on wide screens, detail, edit/delete for owner, add-to-planner from detail.
+- **Cooking:** Step flow, mise en place (optional per-step ingredient links), timers with expand dock + haptics, keep screen on from profile, all-ingredients sheet.
+- **Planner:** Month grid, add from library, recipe titles on meals, delete (PATCH also on API).
+- **Grocery:** Merge from meal plan (rolling window from UI), share as text, delete items, optimistic check toggle with rollback.
+- **Profile:** `PATCH /users/me`, calorie goal, dietary text list, keep-awake preference; Paper theme (Sea Green / accent).
+
+See `docs/API.md` and `docs/ARCHITECTURE.md` for integration details.
