@@ -12,12 +12,17 @@ class MealPlanBase(BaseModel):
 class MealPlanCreate(MealPlanBase):
     pass
 
-class MealPlanUpdate(MealPlanBase):
-    pass
+class MealPlanUpdate(BaseModel):
+    date: Optional[date] = None
+    meal_type: Optional[str] = None
+    recipe_id: Optional[int] = None
+    custom_food_name: Optional[str] = None
+    calories: Optional[int] = None
 
 class MealPlan(MealPlanBase):
     id: int
     user_id: int
+    recipe_title: Optional[str] = None
 
     class Config:
         from_attributes = True

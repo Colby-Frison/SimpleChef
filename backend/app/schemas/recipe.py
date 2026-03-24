@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # Ingredient Schemas
 class IngredientBase(BaseModel):
@@ -8,11 +8,14 @@ class IngredientBase(BaseModel):
     unit: Optional[str] = None
 
 class IngredientCreate(IngredientBase):
-    pass
+    """When creating/updating, link to a step by 1-based order_index (matches Step.order_index)."""
+    step_order_index: Optional[int] = None
+
 
 class Ingredient(IngredientBase):
     id: int
     recipe_id: int
+    step_id: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -43,18 +46,30 @@ class RecipeBase(BaseModel):
     servings: Optional[int] = 1
     difficulty: Optional[str] = "Medium"
     total_calories: Optional[int] = None
+    is_public: Optional[bool] = False
+    tags: List[str] = Field(default_factory=list)
 
 class RecipeCreate(RecipeBase):
     ingredients: List[IngredientCreate] = []
     steps: List[StepCreate] = []
 
-class RecipeUpdate(RecipeBase):
+class RecipeUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    prep_time_minutes: Optional[int] = None
+    cook_time_minutes: Optional[int] = None
+    servings: Optional[int] = None
+    difficulty: Optional[str] = None
+    total_calories: Optional[int] = None
+    is_public: Optional[bool] = None
+    tags: Optional[List[str]] = None
     ingredients: Optional[List[IngredientCreate]] = None
     steps: Optional[List[StepCreate]] = None
 
 class Recipe(RecipeBase):
     id: int
-    created_by_id: Optional[int]
+    created_by_id: Optional[int] = None
     ingredients: List[Ingredient] = []
     steps: List[Step] = []
 

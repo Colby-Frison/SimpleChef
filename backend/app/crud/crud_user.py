@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional, Union
 from sqlalchemy.orm import Session
 from app.core.security import get_password_hash, verify_password
 from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserSelfUpdate, UserUpdate
 
 class CRUDUser:
     def get(self, db: Session, id: Any) -> Optional[User]:
@@ -32,5 +32,14 @@ class CRUDUser:
         if not verify_password(password, user.hashed_password):
             return None
         return user
+
+    def update_self(self, db: Session, *, db_user: User, obj_in: UserSelfUpdate) -> User:
+        update_data = obj_in.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_user, field, value)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
 
 user = CRUDUser()

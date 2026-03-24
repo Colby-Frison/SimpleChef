@@ -34,3 +34,16 @@ def read_user_me(
     Get current user.
     """
     return current_user
+
+
+@router.patch("/me", response_model=schemas.User)
+def update_user_me(
+    *,
+    db: Session = Depends(deps.get_db),
+    body: schemas.UserSelfUpdate,
+    current_user: models.User = Depends(deps.get_current_user),
+) -> Any:
+    """
+    Update profile and preferences for the current user.
+    """
+    return crud.user.update_self(db, db_user=current_user, obj_in=body)
