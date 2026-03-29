@@ -34,7 +34,7 @@ Use this as a working backlog: **P0** = fix before wider testing / demo; **P1** 
 ### Home / recipe library
 
 - [x] **Search:** debounced query + server `q` param; empty state when no matches.
-- [ ] **Filter:** max cook/prep time; profile-tied dietary defaults (tags + difficulty chips exist; time filter not yet).
+- [ ] **Filter:** max cook/prep time in **UI** (API: `max_total_minutes`, `tags_all`; home still difficulty-only); profile-tied dietary defaults.
 - [x] **Grid density:** `numColumns` 2 when width ≥ 720.
 - [x] **Badges on cards:** total time, tags (up to 3), calories when present.
 
@@ -67,7 +67,7 @@ Use this as a working backlog: **P0** = fix before wider testing / demo; **P1** 
 - [x] **Tap day** selects date (replaces static header-only UX).
 - [x] **Add meal from library** + meal type chips.
 - [x] **Recipe title** on plan cards via API `recipe_title`.
-- [ ] **Daily calorie total** vs goal — not built.
+- [x] **Daily calorie total** vs goal — `GET /planner/day-summary` + calendar line (logged kcal vs profile goal); not color-coded by meal type.
 - [x] **Delete meal** — `DELETE` + trash on card; `PATCH` available for edits (no dedicated edit UI).
 - [ ] **Statistics / charts** — deferred.
 

@@ -34,6 +34,8 @@ The system follows a **Client-Server** architecture with a **Layered** approach 
 - **`features/`**: Feature-specific logic (Cooking, Planning, Recipes).
 - **`services/`**: API clients and adapters.
 - **`store/`**: Global state management.
+- **`controllers/`**: Application-layer hooks (`use*Controller`) — load/save orchestration, validation, navigation callbacks; routes and feature views consume these instead of calling `services/api` directly.
+- **`types/`**: DTO-style TypeScript types aligned with FastAPI responses.
 
 ### 3.2. Backend Modules
 - **`api/`**: Route controllers.
@@ -83,3 +85,38 @@ All mutating endpoints must verify the authenticated user owns the resource (or 
 ## 8. Grocery merge from meal plan
 
 - `POST /grocery/from-plan` loads `MealPlan` rows for the user in `[start_date, end_date]` with a `recipe_id`, expands each recipe’s ingredients, aggregates by normalized `(name, unit)`, sums quantities, assigns a default category from keywords, then **merges** into the user’s `GroceryItem` rows (add quantity when the key exists, else insert). Manual-only lines are untouched unless they share the same normalized key.
+
+## 9. Frontend layering (Expo)
+
+```mermaid
+flowchart TB
+  subgraph presentation [Presentation]
+    Routes[Expo Router screens in app/]
+    Views[Feature components e.g. RecipeList]
+  end
+  subgraph application [Application controllers]
+    Hooks[useXController hooks in controllers/]
+  end
+  subgraph data [Data]
+    Api[services/api.ts]
+    Stores[Zustand stores]
+  end
+  Routes --> Hooks
+  Views --> Hooks
+  Hooks --> Api
+  Hooks --> Stores
+```
+
+- **Presentation** (`app/`, `features/`): layout, Paper components, accessibility labels; no direct `recipeService` / `plannerService` calls in route files after the controller refactor.
+- **Application** (`controllers/`): per-screen state, debouncing, modals, and async actions.
+- **Data** (`services/api.ts`, `store/`): HTTP, auth header, 401 handling; global token and timers.
+
+**Documentation links**
+
+- UI / Figma single source: [FIGMA_UI_SYSTEM_REQUIREMENTS.md](./FIGMA_UI_SYSTEM_REQUIREMENTS.md)
+- SRS/proposal ↔ API matrix: [REQUIREMENTS_TRACEABILITY.md](./REQUIREMENTS_TRACEABILITY.md)
+- Backend maintainability backlog (document-only): [BACKEND_REFINEMENT_NOTES.md](./BACKEND_REFINEMENT_NOTES.md)
+
+## 10. Known backend improvements
+
+See [BACKEND_REFINEMENT_NOTES.md](./BACKEND_REFINEMENT_NOTES.md) for suggested refactors (service extraction, test gaps, validation boundaries) tracked without blocking feature work.

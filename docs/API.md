@@ -13,7 +13,7 @@ Interactive OpenAPI: `http://localhost:8000/docs`.
 
 ## Recipes
 
-- `GET /recipes/` — visible recipes: yours or `is_public`. Query: `q` (title contains), `difficulty`, `tag` (JSONB tags contains string), `skip`, `limit`.
+- `GET /recipes/` — visible recipes: yours or `is_public`. Query: `q` (title contains), `difficulty`, `tag` (JSONB tags contains one string), `tags_all` (comma-separated; recipe must contain every tag — useful with profile dietary tags), `max_total_minutes` (prep + cook must be `<=` this), `skip`, `limit`.
 - `GET /recipes/{id}` — 404 if not visible.
 - `POST /recipes/` — sets `created_by_id` to you.
 - `PUT` / `DELETE /recipes/{id}` — owner only (403 otherwise).
@@ -23,6 +23,7 @@ Ingredients may include `step_order_index` (matches `Step.order_index`) to link 
 
 ## Planner
 
+- `GET /planner/day-summary?date=YYYY-MM-DD` — logged calorie totals for that day: `consumed_calories` sums `calories` on meals where the field is set; `meals_without_calories` counts rows with null `calories`. Compare to `calorie_goal` from `GET /users/me` on the client.
 - `GET /planner/?start_date=&end_date=` — your meals; `recipe_title` populated when `recipe_id` is set.
 - `POST /planner/` — create meal.
 - `PATCH /planner/{meal_id}` — update (owner only).
