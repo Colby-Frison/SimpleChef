@@ -4,6 +4,7 @@ import { Appbar, Searchbar, Chip, useTheme } from 'react-native-paper';
 import { RecipeList } from '../../features/recipes/components/RecipeList';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { spacing } from '../../theme/spacing';
+import { useRecipeLibraryController } from '../../controllers';
 
 const DIFFICULTIES = ['', 'Easy', 'Medium', 'Hard'] as const;
 
@@ -11,6 +12,7 @@ export default function HomeScreen() {
   const theme = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [difficulty, setDifficulty] = useState('');
+  const library = useRecipeLibraryController({ searchQuery, difficulty });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -43,7 +45,13 @@ export default function HomeScreen() {
         ))}
       </ScrollView>
       <View style={styles.content}>
-        <RecipeList searchQuery={searchQuery} difficulty={difficulty} />
+        <RecipeList
+          recipes={library.recipes}
+          loading={library.loading}
+          onRefresh={library.refresh}
+          debouncedSearch={library.debouncedSearch}
+          hasActiveFilters={library.hasActiveFilters}
+        />
       </View>
     </SafeAreaView>
   );

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import {
   Text,
@@ -11,13 +11,12 @@ import {
   List,
   useTheme,
 } from 'react-native-paper';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useKeepAwake } from 'expo-keep-awake';
-import { recipeService, userService } from '../../services/api';
-import { useTimerStore } from '../../store/useTimerStore';
 import { TimerDock } from '../../features/cooking/components/TimerDock';
 import { spacing } from '../../theme/spacing';
+import { useCookingController } from '../../controllers';
 
 function KeepScreenOn() {
   useKeepAwake();
@@ -27,71 +26,13 @@ function KeepScreenOn() {
 export default function CookingScreen() {
   const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
-  const [recipe, setRecipe] = useState<any>(null);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
-  const [allIngOpen, setAllIngOpen] = useState(false);
-  const [keepAwakePref, setKeepAwakePref] = useState(false);
+  const c = useCookingController(id);
 
-  const { addTimer, tick } = useTimerStore();
-
-  const loadRecipe = useCallback(async () => {
-    if (!id) return;
-    try {
-      const data = await recipeService.getById(Number(id));
-      setRecipe(data);
-    } catch (error) {
-      console.error(error);
-      setRecipe(null);
-    }
-  }, [id]);
-
-  useEffect(() => {
-    setCurrentStepIndex(0);
-    setChecked({});
-    loadRecipe();
-  }, [id, loadRecipe]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const u = await userService.getMe();
-        setKeepAwakePref(!!u.is_screen_always_on);
-      } catch {
-        setKeepAwakePref(false);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, [tick]);
-
-  const steps = recipe?.steps || [];
-  const ingredients = recipe?.ingredients || [];
-  const currentStep = steps[currentStepIndex];
-
-  const miseItems = useMemo(() => {
-    if (!currentStep) return [];
-    const unlinked = ingredients.filter((i: any) => !i.step_id);
-    const linked = ingredients.filter((i: any) => i.step_id === currentStep.id);
-    const global = currentStepIndex === 0 ? unlinked : [];
-    const map = new Map<number, any>();
-    [...global, ...linked].forEach((i: any) => map.set(i.id, i));
-    return Array.from(map.values());
-  }, [ingredients, currentStep, currentStepIndex]);
-
-  const toggleIng = (ingId: number) => {
-    setChecked((prev) => ({ ...prev, [ingId]: !prev[ingId] }));
-  };
-
-  if (!recipe) {
+  if (c.loading || !c.recipe) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <Appbar.Header>
-          <Appbar.BackAction onPress={() => router.back()} />
+          <Appbar.BackAction onPress={() => c.router.back()} />
           <Appbar.Content title="Cooking" />
         </Appbar.Header>
         <View style={styles.centered}>
@@ -101,18 +42,20 @@ export default function CookingScreen() {
     );
   }
 
+  const { recipe, steps, ingredients, currentStep, currentStepIndex, miseItems } = c;
+
   if (steps.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <Appbar.Header>
-          <Appbar.BackAction onPress={() => router.back()} />
+          <Appbar.BackAction onPress={() => c.router.back()} />
           <Appbar.Content title={recipe.title || 'Recipe'} subtitle="No steps" />
         </Appbar.Header>
         <View style={styles.centered}>
           <Text variant="bodyLarge" style={styles.emptyText}>
             This recipe has no steps yet. Add steps in the recipe editor, then try again.
           </Text>
-          <Button mode="contained" onPress={() => router.back()} style={styles.emptyButton}>
+          <Button mode="contained" onPress={() => c.router.back()} style={styles.emptyButton}>
             Go back
           </Button>
         </View>
@@ -120,33 +63,16 @@ export default function CookingScreen() {
     );
   }
 
-  const isLastStep = currentStepIndex === steps.length - 1;
-
-  const nextStep = () => {
-    if (!isLastStep) setCurrentStepIndex(currentStepIndex + 1);
-    else router.back();
-  };
-
-  const prevStep = () => {
-    if (currentStepIndex > 0) setCurrentStepIndex(currentStepIndex - 1);
-  };
-
-  const handleStartTimer = () => {
-    if (currentStep.timer_seconds) {
-      addTimer(`Step ${currentStep.order_index}`, currentStep.timer_seconds);
-    }
-  };
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {keepAwakePref ? <KeepScreenOn /> : null}
+      {c.keepAwakePref ? <KeepScreenOn /> : null}
       <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.BackAction onPress={() => c.router.back()} />
         <Appbar.Content
           title={`Step ${currentStepIndex + 1} of ${steps.length}`}
           subtitle={recipe.title}
         />
-        <Appbar.Action icon="format-list-bulleted" onPress={() => setAllIngOpen(true)} accessibilityLabel="View all ingredients" />
+        <Appbar.Action icon="format-list-bulleted" onPress={() => c.setAllIngOpen(true)} accessibilityLabel="View all ingredients" />
       </Appbar.Header>
 
       <ProgressBar progress={(currentStepIndex + 1) / steps.length} />
@@ -159,11 +85,11 @@ export default function CookingScreen() {
             <Text variant="titleMedium" style={styles.miseTitle}>
               Mise en place
             </Text>
-            {miseItems.map((ing: any) => (
+            {miseItems.map((ing) => (
               <View key={ing.id} style={styles.miseRow}>
                 <Checkbox
-                  status={checked[ing.id] ? 'checked' : 'unchecked'}
-                  onPress={() => toggleIng(ing.id)}
+                  status={c.checked[ing.id] ? 'checked' : 'unchecked'}
+                  onPress={() => c.toggleIng(ing.id)}
                 />
                 <Text variant="bodyLarge" style={styles.miseText}>
                   {ing.name}
@@ -175,40 +101,40 @@ export default function CookingScreen() {
         ) : null}
 
         <Text variant="headlineSmall" style={styles.stepTitle}>
-          Step {currentStep.order_index}
+          Step {currentStep!.order_index}
         </Text>
 
         <Text variant="bodyLarge" style={styles.instruction}>
-          {currentStep.instruction}
+          {currentStep!.instruction}
         </Text>
 
-        {currentStep.timer_seconds ? (
-          <Button mode="contained" icon="timer" onPress={handleStartTimer} style={styles.timerButton}>
-            Start {currentStep.timer_seconds / 60} min timer
+        {currentStep!.timer_seconds ? (
+          <Button mode="contained" icon="timer" onPress={c.handleStartTimer} style={styles.timerButton}>
+            Start {currentStep!.timer_seconds / 60} min timer
           </Button>
         ) : null}
       </ScrollView>
 
       <View style={[styles.footer, { borderTopColor: theme.colors.outline }]}>
-        <Button mode="outlined" onPress={prevStep} disabled={currentStepIndex === 0}>
+        <Button mode="outlined" onPress={c.prevStep} disabled={currentStepIndex === 0}>
           Previous
         </Button>
-        <Button mode="contained" onPress={nextStep}>
-          {isLastStep ? 'Finish cooking' : 'Next step'}
+        <Button mode="contained" onPress={c.nextStep}>
+          {c.isLastStep ? 'Finish cooking' : 'Next step'}
         </Button>
       </View>
 
       <Portal>
         <Modal
-          visible={allIngOpen}
-          onDismiss={() => setAllIngOpen(false)}
+          visible={c.allIngOpen}
+          onDismiss={() => c.setAllIngOpen(false)}
           contentContainerStyle={[styles.allModal, { backgroundColor: theme.colors.surface }]}
         >
           <Text variant="titleLarge" style={styles.modalTitle}>
             All ingredients
           </Text>
           <ScrollView style={styles.modalScroll}>
-            {ingredients.map((ing: any) => (
+            {ingredients.map((ing) => (
               <List.Item
                 key={ing.id}
                 title={ing.name}
@@ -216,7 +142,7 @@ export default function CookingScreen() {
               />
             ))}
           </ScrollView>
-          <Button mode="contained" onPress={() => setAllIngOpen(false)}>
+          <Button mode="contained" onPress={() => c.setAllIngOpen(false)}>
             Close
           </Button>
         </Modal>

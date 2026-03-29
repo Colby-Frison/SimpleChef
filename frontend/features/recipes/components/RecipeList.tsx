@@ -1,52 +1,30 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { FlatList, View, StyleSheet, useWindowDimensions } from 'react-native';
 import { ActivityIndicator, Text, useTheme } from 'react-native-paper';
-import { RecipeCard } from './RecipeCard';
-import { recipeService } from '../../../services/api';
 import { useRouter } from 'expo-router';
+import { RecipeCard } from './RecipeCard';
 import { spacing } from '../../../theme/spacing';
+import type { RecipeListItemDto } from '../../../types';
 
-type RecipeListProps = {
-  searchQuery?: string;
-  difficulty?: string;
+export type RecipeListProps = {
+  recipes: RecipeListItemDto[];
+  loading: boolean;
+  onRefresh: () => void;
+  debouncedSearch: string;
+  hasActiveFilters: boolean;
 };
 
-export const RecipeList = ({ searchQuery = '', difficulty = '' }: RecipeListProps) => {
-  const [recipes, setRecipes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [debouncedQ, setDebouncedQ] = useState('');
+export const RecipeList = ({
+  recipes,
+  loading,
+  onRefresh,
+  debouncedSearch,
+  hasActiveFilters,
+}: RecipeListProps) => {
   const router = useRouter();
   const theme = useTheme();
   const { width } = useWindowDimensions();
   const numColumns = width >= 720 ? 2 : 1;
-
-  useEffect(() => {
-    if (searchQuery === '') {
-      setDebouncedQ('');
-      return;
-    }
-    const t = setTimeout(() => setDebouncedQ(searchQuery), 400);
-    return () => clearTimeout(t);
-  }, [searchQuery]);
-
-  const loadRecipes = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await recipeService.getAll({
-        q: debouncedQ.trim() || undefined,
-        difficulty: difficulty.trim() || undefined,
-      });
-      setRecipes(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedQ, difficulty]);
-
-  useEffect(() => {
-    loadRecipes();
-  }, [loadRecipes]);
 
   if (loading && recipes.length === 0) {
     return <ActivityIndicator style={styles.loading} size="large" />;
@@ -60,15 +38,15 @@ export const RecipeList = ({ searchQuery = '', difficulty = '' }: RecipeListProp
       keyExtractor={(item) => item.id.toString()}
       columnWrapperStyle={numColumns > 1 ? styles.columnWrap : undefined}
       refreshing={loading}
-      onRefresh={loadRecipes}
+      onRefresh={onRefresh}
       renderItem={({ item }) => (
         <View style={numColumns > 1 ? styles.gridCell : styles.fullWidth}>
           <RecipeCard
             id={item.id}
             title={item.title}
-            image={item.image_url}
+            image={item.image_url ?? undefined}
             totalTimeMinutes={(item.prep_time_minutes || 0) + (item.cook_time_minutes || 0)}
-            difficulty={item.difficulty}
+            difficulty={item.difficulty ?? '—'}
             tags={item.tags}
             calories={item.total_calories}
             compact={numColumns > 1}
@@ -79,7 +57,7 @@ export const RecipeList = ({ searchQuery = '', difficulty = '' }: RecipeListProp
       contentContainerStyle={styles.list}
       ListEmptyComponent={
         <Text style={[styles.empty, { color: theme.colors.onSurfaceVariant }]}>
-          {debouncedQ.trim() || difficulty
+          {hasActiveFilters
             ? 'No recipes match your filters.'
             : 'No recipes found. Add one!'}
         </Text>

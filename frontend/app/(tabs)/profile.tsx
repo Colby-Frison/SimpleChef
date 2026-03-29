@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import {
   Text,
@@ -11,75 +11,16 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { userService } from '../../services/api';
-import { useAuthStore } from '../../store/useAuthStore';
 import { spacing } from '../../theme/spacing';
+import { useProfileController } from '../../controllers';
 
 const DIETARY_PRESETS = ['Vegetarian', 'Vegan', 'Gluten-free', 'Dairy-free', 'Nut-free'];
 
 export default function ProfileScreen() {
   const theme = useTheme();
-  const router = useRouter();
-  const { token, logout } = useAuthStore();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [fullName, setFullName] = useState('');
-  const [bio, setBio] = useState('');
-  const [calorieGoal, setCalorieGoal] = useState('2000');
-  const [dietaryText, setDietaryText] = useState('');
-  const [keepAwake, setKeepAwake] = useState(true);
-  const [snackbar, setSnackbar] = useState<string | null>(null);
+  const c = useProfileController();
 
-  const loadUser = async () => {
-    if (!token) return;
-    try {
-      const u = await userService.getMe();
-      setFullName(u.full_name || '');
-      setBio(u.bio || '');
-      setCalorieGoal(String(u.calorie_goal ?? 2000));
-      setDietaryText(Array.isArray(u.dietary_restrictions) ? u.dietary_restrictions.join(', ') : '');
-      setKeepAwake(u.is_screen_always_on !== false);
-    } catch {
-      setSnackbar('Could not load profile.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadUser();
-  }, [token]);
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const dietary_restrictions = dietaryText
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
-      const cg = parseInt(calorieGoal, 10);
-      await userService.patchMe({
-        full_name: fullName || null,
-        bio: bio || null,
-        calorie_goal: Number.isNaN(cg) ? 2000 : cg,
-        dietary_restrictions,
-        is_screen_always_on: keepAwake,
-      });
-      setSnackbar('Profile saved.');
-    } catch {
-      setSnackbar('Could not save profile.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    router.replace('/login');
-  };
-
-  if (loading) {
+  if (c.loading) {
     return (
       <SafeAreaView style={styles.container}>
         <ActivityIndicator size="large" style={styles.loading} />
@@ -97,20 +38,20 @@ export default function ProfileScreen() {
           Friends / social features are out of scope for this build; see CONTINUATION_CHECKLIST.
         </Text>
 
-        <TextInput label="Full name" value={fullName} onChangeText={setFullName} mode="outlined" style={styles.field} />
-        <TextInput label="Bio" value={bio} onChangeText={setBio} mode="outlined" multiline style={styles.field} />
+        <TextInput label="Full name" value={c.fullName} onChangeText={c.setFullName} mode="outlined" style={styles.field} />
+        <TextInput label="Bio" value={c.bio} onChangeText={c.setBio} mode="outlined" multiline style={styles.field} />
         <TextInput
           label="Calorie goal (kcal/day)"
-          value={calorieGoal}
-          onChangeText={setCalorieGoal}
+          value={c.calorieGoal}
+          onChangeText={c.setCalorieGoal}
           keyboardType="numeric"
           mode="outlined"
           style={styles.field}
         />
         <TextInput
           label="Dietary restrictions (comma-separated)"
-          value={dietaryText}
-          onChangeText={setDietaryText}
+          value={c.dietaryText}
+          onChangeText={c.setDietaryText}
           mode="outlined"
           placeholder={DIETARY_PRESETS.join(', ')}
           style={styles.field}
@@ -118,21 +59,21 @@ export default function ProfileScreen() {
 
         <View style={styles.row}>
           <Text variant="bodyLarge">Keep screen on while cooking</Text>
-          <Switch value={keepAwake} onValueChange={setKeepAwake} accessibilityLabel="Keep screen on while cooking" />
+          <Switch value={c.keepAwake} onValueChange={c.setKeepAwake} accessibilityLabel="Keep screen on while cooking" />
         </View>
 
-        <Button mode="contained" onPress={handleSave} loading={saving} disabled={saving} style={styles.save}>
+        <Button mode="contained" onPress={c.save} loading={c.saving} disabled={c.saving} style={styles.save}>
           Save
         </Button>
 
         <Divider style={styles.divider} />
 
-        <Button mode="outlined" onPress={handleLogout} style={styles.button} icon="logout" accessibilityLabel="Sign out">
+        <Button mode="outlined" onPress={c.logoutAndGoLogin} style={styles.button} icon="logout" accessibilityLabel="Sign out">
           Sign out
         </Button>
       </ScrollView>
-      <Snackbar visible={!!snackbar} onDismiss={() => setSnackbar(null)} duration={3000}>
-        {snackbar}
+      <Snackbar visible={!!c.snackbar} onDismiss={() => c.setSnackbar(null)} duration={3000}>
+        {c.snackbar}
       </Snackbar>
     </SafeAreaView>
   );

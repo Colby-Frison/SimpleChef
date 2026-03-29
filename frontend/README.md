@@ -2,6 +2,10 @@
 
 This is an [Expo](https://expo.dev) app using file-based routing ([Expo Router](https://docs.expo.dev/router/introduction/)).
 
+## Application structure (controllers)
+
+Add a screen by creating a **`useYourFeatureController`** hook under `controllers/` that owns API calls, loading/error flags, and user actions. Keep the route file in `app/` thin: call the hook and render Paper/layout only. Re-export hooks from `controllers/index.ts` when they are part of the public surface. See `docs/ARCHITECTURE.md` section 9 and `docs/FIGMA_UI_SYSTEM_REQUIREMENTS.md` for layering and UI requirements.
+
 ## API and auth
 
 - Set `EXPO_PUBLIC_API_URL` to your backend base URL including `/api/v1` (e.g. `http://localhost:8000/api/v1`). If unset, dev builds infer the host from Metro.

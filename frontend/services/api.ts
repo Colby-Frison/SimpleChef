@@ -70,6 +70,8 @@ export type RecipeListParams = {
   q?: string;
   difficulty?: string;
   tag?: string;
+  tags_all?: string;
+  max_total_minutes?: number;
   skip?: number;
   limit?: number;
 };
@@ -113,6 +115,10 @@ export const userService = {
 };
 
 export const plannerService = {
+  getDaySummary: async (date: string) => {
+    const response = await api.get('/planner/day-summary', { params: { date } });
+    return response.data;
+  },
   getPlans: async (startDate: string, endDate: string) => {
     const response = await api.get('/planner/', { params: { start_date: startDate, end_date: endDate } });
     return response.data;
