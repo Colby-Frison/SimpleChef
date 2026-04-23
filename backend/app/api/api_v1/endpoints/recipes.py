@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -118,13 +118,13 @@ def update_recipe(
     return crud.recipe.update(db=db, db_obj=recipe, obj_in=recipe_in)
 
 
-@router.delete("/{id}", response_model=schemas.Recipe)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_recipe(
     *,
     db: Session = Depends(deps.get_db),
     id: int,
     current_user: models.User = Depends(deps.get_current_user),
-) -> Any:
+) -> None:
     """
     Delete a recipe (owner only).
     """
@@ -133,7 +133,6 @@ def delete_recipe(
         raise HTTPException(status_code=404, detail="Recipe not found")
     if recipe.created_by_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    response = schemas.Recipe.model_validate(recipe)
     if not crud.recipe.remove(db=db, id=id):
         raise HTTPException(status_code=404, detail="Recipe not found")
-    return response
+    return None

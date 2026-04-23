@@ -73,19 +73,15 @@ export default function RecipeDetail() {
       </div>
 
       <div className="max-w-screen-xl mx-auto">
-        <div className="relative aspect-video overflow-hidden bg-muted">
-          {recipe.image_url ? (
+        {recipe.image_url ? (
+          <div className="relative aspect-video overflow-hidden bg-muted">
             <ImageWithFallback
               src={recipe.image_url}
               alt={recipe.title}
               className="w-full h-full object-cover"
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Flame className="w-20 h-20 text-muted-foreground" />
-            </div>
-          )}
-        </div>
+          </div>
+        ) : null}
 
         <div className="px-4">
           <div className="py-6">
@@ -152,6 +148,24 @@ export default function RecipeDetail() {
                       <Flame className="w-4 h-4" />
                       <span>{recipe.total_calories}</span>
                     </div>
+                  </div>
+                )}
+                {recipe.protein_grams != null && (
+                  <div className="text-center">
+                    <div className="text-muted-foreground text-sm mb-1">Protein</div>
+                    <div>{recipe.protein_grams}g</div>
+                  </div>
+                )}
+                {recipe.carbs_grams != null && (
+                  <div className="text-center">
+                    <div className="text-muted-foreground text-sm mb-1">Carbs</div>
+                    <div>{recipe.carbs_grams}g</div>
+                  </div>
+                )}
+                {recipe.fat_grams != null && (
+                  <div className="text-center">
+                    <div className="text-muted-foreground text-sm mb-1">Fat</div>
+                    <div>{recipe.fat_grams}g</div>
                   </div>
                 )}
               </div>

@@ -3,6 +3,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 from app.models.recipe import Recipe, Ingredient, Step
+from app.models.meal_plan import MealPlan
 from app.schemas.recipe import RecipeCreate, RecipeUpdate
 
 
@@ -138,6 +139,13 @@ class CRUDRecipe:
         obj = self.get(db, id)
         if not obj:
             return None
+        # Detach planner rows that reference this recipe so historical plans remain
+        # while satisfying FK constraints on recipe delete.
+        linked_plans = db.query(MealPlan).filter(MealPlan.recipe_id == id).all()
+        for plan in linked_plans:
+            if not plan.custom_food_name:
+                plan.custom_food_name = obj.title
+            plan.recipe_id = None
         db.delete(obj)
         db.commit()
         return obj

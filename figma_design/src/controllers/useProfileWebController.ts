@@ -13,6 +13,7 @@ export function useProfileWebController() {
   const [calorieGoal, setCalorieGoal] = useState('2000');
   const [dietaryText, setDietaryText] = useState('');
   const [keepAwake, setKeepAwake] = useState(true);
+  const [profileImageUrl, setProfileImageUrl] = useState('');
   const [snackbar, setSnackbar] = useState<string | null>(null);
   const [email, setEmail] = useState('');
 
@@ -25,6 +26,7 @@ export function useProfileWebController() {
       setCalorieGoal(String(u.calorie_goal ?? 2000));
       setDietaryText(Array.isArray(u.dietary_restrictions) ? u.dietary_restrictions.join(', ') : '');
       setKeepAwake(u.is_screen_always_on !== false);
+      setProfileImageUrl(u.profile_image_url || '');
       setEmail(u.email || '');
     } catch {
       setSnackbar('Could not load profile.');
@@ -49,6 +51,7 @@ export function useProfileWebController() {
       await userService.patchMe({
         full_name: fullName || null,
         bio: bio || null,
+        profile_image_url: profileImageUrl.trim() || null,
         calorie_goal: Number.isNaN(cg) ? 2000 : cg,
         dietary_restrictions,
         is_screen_always_on: keepAwake,
@@ -79,9 +82,12 @@ export function useProfileWebController() {
     setDietaryText,
     keepAwake,
     setKeepAwake,
+    profileImageUrl,
+    setProfileImageUrl,
     snackbar,
     setSnackbar,
     save,
+    loadUser,
     logoutAndGoLogin,
     email,
   };

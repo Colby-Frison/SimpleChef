@@ -21,9 +21,14 @@ export function useManualRecipeWebController(
 ) {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [prepTime, setPrepTime] = useState('');
   const [cookTime, setCookTime] = useState('');
   const [servings, setServings] = useState('');
+  const [calories, setCalories] = useState('');
+  const [protein, setProtein] = useState('');
+  const [carbs, setCarbs] = useState('');
+  const [fat, setFat] = useState('');
   const [tagsText, setTagsText] = useState('');
   const [ingredients, setIngredients] = useState<ManualIngredientRow[]>([
     { name: '', quantity: '', unit: '', stepOrder: '' },
@@ -38,9 +43,14 @@ export function useManualRecipeWebController(
     try {
       const data = JSON.parse(initialData) as Record<string, unknown>;
       setTitle((data.title as string) || '');
+      setImageUrl((data.image_url as string) || '');
       setPrepTime(data.prep_time_minutes != null ? String(data.prep_time_minutes) : '');
       setCookTime(data.cook_time_minutes != null ? String(data.cook_time_minutes) : '');
       setServings(data.servings != null ? String(data.servings) : '');
+      setCalories(data.total_calories != null ? String(data.total_calories) : '');
+      setProtein(data.protein_grams != null ? String(data.protein_grams) : '');
+      setCarbs(data.carbs_grams != null ? String(data.carbs_grams) : '');
+      setFat(data.fat_grams != null ? String(data.fat_grams) : '');
       setTagsText(Array.isArray(data.tags) ? (data.tags as string[]).join(', ') : '');
       const ing = data.ingredients as unknown[] | undefined;
       setIngredients(
@@ -79,9 +89,14 @@ export function useManualRecipeWebController(
         const data: RecipeDto = await recipeService.getById(Number(editId));
         if (cancelled) return;
         setTitle(data.title || '');
+        setImageUrl(data.image_url || '');
         setPrepTime(data.prep_time_minutes?.toString() || '');
         setCookTime(data.cook_time_minutes?.toString() || '');
         setServings(data.servings?.toString() || '');
+        setCalories(data.total_calories?.toString() || '');
+        setProtein(data.protein_grams?.toString() || '');
+        setCarbs(data.carbs_grams?.toString() || '');
+        setFat(data.fat_grams?.toString() || '');
         setTagsText(Array.isArray(data.tags) ? data.tags.join(', ') : '');
         setSteps(
           data.steps?.length
@@ -164,9 +179,14 @@ export function useManualRecipeWebController(
         .filter(Boolean);
       const payload = {
         title,
+        image_url: imageUrl.trim() || null,
         prep_time_minutes: parseInt(prepTime, 10) || 0,
         cook_time_minutes: parseInt(cookTime, 10) || 0,
         servings: parseInt(servings, 10) || 1,
+        total_calories: parseInt(calories, 10) || null,
+        protein_grams: parseInt(protein, 10) || null,
+        carbs_grams: parseInt(carbs, 10) || null,
+        fat_grams: parseInt(fat, 10) || null,
         tags,
         ingredients: ingredients.map((i) => {
           const so = String(i.stepOrder || '').trim();
@@ -204,12 +224,22 @@ export function useManualRecipeWebController(
   return {
     title,
     setTitle,
+    imageUrl,
+    setImageUrl,
     prepTime,
     setPrepTime,
     cookTime,
     setCookTime,
     servings,
     setServings,
+    calories,
+    setCalories,
+    protein,
+    setProtein,
+    carbs,
+    setCarbs,
+    fat,
+    setFat,
     tagsText,
     setTagsText,
     ingredients,

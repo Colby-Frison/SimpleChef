@@ -16,25 +16,20 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
   return (
     <Link to={`/recipe/${recipe.id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
-        <div className="relative aspect-video overflow-hidden bg-muted">
-          {recipe.image_url ? (
+        {recipe.image_url ? (
+          <div className="relative aspect-video overflow-hidden bg-muted">
             <ImageWithFallback
               src={recipe.image_url}
               alt={recipe.title}
               className="w-full h-full object-cover"
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Flame className="w-12 h-12 text-muted-foreground" />
-            </div>
-          )}
-
-          {recipe.difficulty && (
-            <Badge variant="secondary" className="absolute top-2 right-2 capitalize">
-              {recipe.difficulty}
-            </Badge>
-          )}
-        </div>
+            {recipe.difficulty && (
+              <Badge variant="secondary" className="absolute top-2 right-2 capitalize">
+                {recipe.difficulty}
+              </Badge>
+            )}
+          </div>
+        ) : null}
 
         <CardContent className="p-4">
           <h3 className="mb-2 line-clamp-2">{recipe.title}</h3>

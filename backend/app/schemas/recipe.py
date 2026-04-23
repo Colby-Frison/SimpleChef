@@ -46,6 +46,9 @@ class RecipeBase(BaseModel):
     servings: Optional[int] = 1
     difficulty: Optional[str] = "Medium"
     total_calories: Optional[int] = None
+    protein_grams: Optional[int] = None
+    carbs_grams: Optional[int] = None
+    fat_grams: Optional[int] = None
     is_public: Optional[bool] = False
     tags: List[str] = Field(default_factory=list)
 
@@ -62,6 +65,9 @@ class RecipeUpdate(BaseModel):
     servings: Optional[int] = None
     difficulty: Optional[str] = None
     total_calories: Optional[int] = None
+    protein_grams: Optional[int] = None
+    carbs_grams: Optional[int] = None
+    fat_grams: Optional[int] = None
     is_public: Optional[bool] = None
     tags: Optional[List[str]] = None
     ingredients: Optional[List[IngredientCreate]] = None

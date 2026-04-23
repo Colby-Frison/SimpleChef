@@ -15,6 +15,9 @@ class Recipe(Base):
     difficulty = Column(String, default="Medium") # Easy, Medium, Hard
     
     total_calories = Column(Integer, nullable=True)
+    protein_grams = Column(Integer, nullable=True)
+    carbs_grams = Column(Integer, nullable=True)
+    fat_grams = Column(Integer, nullable=True)
     created_by_id = Column(Integer, ForeignKey("user.id"), nullable=True)
     is_public = Column(Boolean, default=False, nullable=False)
     tags = Column(JSONB, nullable=False, default=list, server_default="[]")

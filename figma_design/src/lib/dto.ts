@@ -27,6 +27,9 @@ export type RecipeDto = {
   servings?: number | null;
   difficulty?: string | null;
   total_calories?: number | null;
+  protein_grams?: number | null;
+  carbs_grams?: number | null;
+  fat_grams?: number | null;
   created_by_id?: number | null;
   is_public?: boolean;
   tags?: string[];
@@ -43,6 +46,9 @@ export type RecipeListItemDto = {
   difficulty?: string | null;
   tags?: string[];
   total_calories?: number | null;
+  protein_grams?: number | null;
+  carbs_grams?: number | null;
+  fat_grams?: number | null;
 };
 
 export type UserDto = {

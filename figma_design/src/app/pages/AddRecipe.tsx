@@ -105,6 +105,15 @@ export default function AddRecipe() {
                   <Label htmlFor="title">Title</Label>
                   <Input id="title" value={manual.title} onChange={(e) => manual.setTitle(e.target.value)} />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="image-url">Image URL</Label>
+                  <Input
+                    id="image-url"
+                    value={manual.imageUrl}
+                    onChange={(e) => manual.setImageUrl(e.target.value)}
+                    placeholder="https://example.com/recipe.jpg"
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="prep">Prep (min)</Label>
@@ -133,6 +142,44 @@ export default function AddRecipe() {
                     value={manual.servings}
                     onChange={(e) => manual.setServings(e.target.value)}
                   />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="calories">Calories</Label>
+                    <Input
+                      id="calories"
+                      inputMode="numeric"
+                      value={manual.calories}
+                      onChange={(e) => manual.setCalories(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="protein">Protein (g)</Label>
+                    <Input
+                      id="protein"
+                      inputMode="numeric"
+                      value={manual.protein}
+                      onChange={(e) => manual.setProtein(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="carbs">Carbs (g)</Label>
+                    <Input
+                      id="carbs"
+                      inputMode="numeric"
+                      value={manual.carbs}
+                      onChange={(e) => manual.setCarbs(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fat">Fat (g)</Label>
+                    <Input
+                      id="fat"
+                      inputMode="numeric"
+                      value={manual.fat}
+                      onChange={(e) => manual.setFat(e.target.value)}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="tags">Tags (comma-separated)</Label>

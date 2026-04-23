@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 export default function Grocery() {
   const c = useGroceryWebController();
   const [showMergeDialog, setShowMergeDialog] = useState(false);
+  const [mergeDaysForward, setMergeDaysForward] = useState('7');
   const [newItemName, setNewItemName] = useState('');
   const [newItemQuantity, setNewItemQuantity] = useState('');
   const [newItemUnit, setNewItemUnit] = useState('');
@@ -59,7 +60,9 @@ export default function Grocery() {
   };
 
   const handleMerge = async () => {
-    await c.mergeFromPlan();
+    const parsed = parseInt(mergeDaysForward, 10);
+    const days = Number.isNaN(parsed) ? 7 : Math.max(1, parsed);
+    await c.mergeFromPlan(days);
     setShowMergeDialog(false);
     toast.success('Merged from meal plan');
   };
@@ -216,9 +219,23 @@ export default function Grocery() {
           <DialogHeader>
             <DialogTitle>Merge from Meal Plan</DialogTitle>
             <DialogDescription>
-              Add ingredients from your planned meals for the last 7 days.
+              Add ingredients from your planned meals for upcoming days.
             </DialogDescription>
           </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Label htmlFor="merge-days">Days forward</Label>
+            <Input
+              id="merge-days"
+              type="number"
+              min={1}
+              value={mergeDaysForward}
+              onChange={(e) => setMergeDaysForward(e.target.value)}
+              placeholder="7"
+            />
+            <p className="text-xs text-muted-foreground">
+              Uses today through the next {Math.max(1, parseInt(mergeDaysForward || '7', 10) || 7)} day(s).
+            </p>
+          </div>
           <DialogFooter>
             <Button variant="outline" type="button" onClick={() => setShowMergeDialog(false)}>
               Cancel

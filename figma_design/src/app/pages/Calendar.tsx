@@ -164,7 +164,7 @@ export default function Calendar() {
                   type="button"
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => c.addRecipeMeal(r.id, r.title)}
+                  onClick={() => c.addRecipeMeal(r.id, r.title, r.total_calories)}
                 >
                   {r.title}
                 </Button>

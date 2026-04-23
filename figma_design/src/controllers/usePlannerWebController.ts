@@ -103,13 +103,14 @@ export function usePlannerWebController() {
     }
   };
 
-  const addRecipeMeal = async (recipeId: number, title: string) => {
+  const addRecipeMeal = async (recipeId: number, title: string, calories?: number | null) => {
     try {
       await plannerService.addPlan({
         date: selectedDate,
         meal_type: pickMealType,
         recipe_id: recipeId,
         custom_food_name: title,
+        calories: calories ?? undefined,
       });
       setLibraryOpen(false);
       await loadPlans();

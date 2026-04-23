@@ -48,10 +48,11 @@ export function useGroceryWebController() {
     }
   };
 
-  const mergeFromPlan = async () => {
-    const end = new Date();
+  const mergeFromPlan = async (daysForward = 7) => {
     const start = new Date();
-    start.setDate(end.getDate() - 7);
+    const end = new Date();
+    const safeDays = Number.isFinite(daysForward) ? Math.max(1, Math.floor(daysForward)) : 7;
+    end.setDate(start.getDate() + safeDays);
     const fmt = (d: Date) => d.toISOString().split('T')[0];
     setMerging(true);
     try {
