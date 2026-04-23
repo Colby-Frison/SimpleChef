@@ -41,24 +41,20 @@ A smart cooking assistant app.
    ```bash
    createdb -U postgres simplechef
    ```
-
-7. Run Migrations:
+7. Set Environment Variables:
+   ```bash
+   touch .env
+   echo "POSTGRES_USER=postgres\nPOSTGRES_PASSWORD=postgres\nPOSTGRES_SERVER=localhost\nPOSTGRES_PORT=5432\nPOSTGRES_DB=simplechef" >> .env
+   ```
+8. Run Migrations:
    ```bash
    alembic upgrade head
    ```
-8. Start Server:
+9. Start Server:
    ```bash
    python run.py
    ```
    API will be available at `http://localhost:8000`. Docs at `http://localhost:8000/docs`.
-
-
-
-
-
-
-
-
 
 
 ### Frontend 
@@ -66,11 +62,16 @@ A smart cooking assistant app.
    ```bash
    cd figma_design
    ```
-2. Install dependencies:
+2. Set ENV variable:
+```bash
+   touch .env
+   echo "VITE_API_URL=http://0.0.0.0:8000/api/v1" >> .env
+```
+3. Install dependencies:
    ```bash
    npm install
    ```
-3. Start Expo:
+4. Start Vite:
    ```bash
    npm run dev
    ```
