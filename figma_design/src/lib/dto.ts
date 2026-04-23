@@ -43,6 +43,7 @@ export type RecipeListItemDto = {
   image_url?: string | null;
   prep_time_minutes?: number | null;
   cook_time_minutes?: number | null;
+  servings?: number | null;
   difficulty?: string | null;
   tags?: string[];
   total_calories?: number | null;
@@ -70,6 +71,9 @@ export type MealPlanDto = {
   recipe_id?: number | null;
   custom_food_name?: string | null;
   calories?: number | null;
+  protein_grams?: number | null;
+  carbs_grams?: number | null;
+  fat_grams?: number | null;
   recipe_title?: string | null;
 };
 

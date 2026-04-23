@@ -39,6 +39,10 @@
   --sidebar-accent-foreground: #3D405B;
   --sidebar-border: rgba(0, 0, 0, 0.1);
   --sidebar-ring: #2E8B57;
+  /* Macro ring (DayMacroRing): dark track + light “untracked” slice */
+  --macro-ring-track: #5a5a64;
+  --macro-ring-untracked: #d9d9df;
+  --macro-ring-remainder: #8e8e9a;
 }
 
 .dark {
@@ -76,6 +80,9 @@
   --sidebar-accent-foreground: #e8e9ed;
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: #3fa969;
+  --macro-ring-track: #353542;
+  --macro-ring-untracked: #b4b4be;
+  --macro-ring-remainder: #6a6a78;
 }
 
 @theme inline {

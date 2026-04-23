@@ -8,6 +8,9 @@ class MealPlanBase(BaseModel):
     recipe_id: Optional[int] = None
     custom_food_name: Optional[str] = None
     calories: Optional[int] = None
+    protein_grams: Optional[int] = None
+    carbs_grams: Optional[int] = None
+    fat_grams: Optional[int] = None
 
 class MealPlanCreate(MealPlanBase):
     pass
@@ -18,6 +21,9 @@ class MealPlanUpdate(BaseModel):
     recipe_id: Optional[int] = None
     custom_food_name: Optional[str] = None
     calories: Optional[int] = None
+    protein_grams: Optional[int] = None
+    carbs_grams: Optional[int] = None
+    fat_grams: Optional[int] = None
 
 class MealPlan(MealPlanBase):
     id: int

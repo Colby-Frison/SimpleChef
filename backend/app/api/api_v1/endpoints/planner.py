@@ -20,6 +20,9 @@ def _meal_plan_to_schema(p: MealPlan) -> schemas.MealPlan:
         recipe_id=p.recipe_id,
         custom_food_name=p.custom_food_name,
         calories=p.calories,
+        protein_grams=p.protein_grams,
+        carbs_grams=p.carbs_grams,
+        fat_grams=p.fat_grams,
         recipe_title=p.recipe.title if p.recipe else None,
     )
 
@@ -73,8 +76,23 @@ def create_meal_plan(
 ) -> Any:
     """
     Add a meal to the plan.
+    When `recipe_id` is set, missing calories and macro grams are filled from the recipe.
     """
-    created = crud.meal_plan.create(db=db, obj_in=meal_plan_in, user_id=current_user.id)
+    payload = meal_plan_in.model_dump()
+    if meal_plan_in.recipe_id:
+        recipe = (
+            db.query(models.Recipe)
+            .filter(models.Recipe.id == meal_plan_in.recipe_id)
+            .first()
+        )
+        if recipe:
+            if payload.get("calories") is None:
+                payload["calories"] = recipe.total_calories
+            for attr in ("protein_grams", "carbs_grams", "fat_grams"):
+                if payload.get(attr) is None:
+                    payload[attr] = getattr(recipe, attr, None)
+    enriched = schemas.MealPlanCreate(**payload)
+    created = crud.meal_plan.create(db=db, obj_in=enriched, user_id=current_user.id)
     p = (
         db.query(MealPlan)
         .options(joinedload(MealPlan.recipe))

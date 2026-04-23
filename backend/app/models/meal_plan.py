@@ -19,7 +19,10 @@ class MealPlan(Base):
     # For quick add without recipe
     custom_food_name = Column(String, nullable=True)
     calories = Column(Integer, nullable=True)
-    
+    protein_grams = Column(Integer, nullable=True)
+    carbs_grams = Column(Integer, nullable=True)
+    fat_grams = Column(Integer, nullable=True)
+
     meal_type = Column(String, default=MealType.DINNER) # Simple string or Enum
     
     recipe = relationship("Recipe")
