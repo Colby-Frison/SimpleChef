@@ -1,6 +1,6 @@
 # Figma UI system requirements (SimpleChef)
 
-Single reference for **Figma prototypes** and **course submission**: merges [Prompt.md](../Prompt.md) (sections 2–4, 6), [docs/REQUIREMENTS.md](./REQUIREMENTS.md), [CONTINUATION_CHECKLIST.md](../CONTINUATION_CHECKLIST.md), and the project proposal LaTeX sources ([sec-goals.tex](./Assignments/Project%20Proposal/Latex/sec-goals.tex), [sec-proposedUI.tex](./Assignments/Project%20Proposal/Latex/sec-proposedUI.tex), [sec-issues.tex](./Assignments/Project%20Proposal/Latex/sec-issues.tex)). API truth: [API.md](./API.md).
+Single reference for **Figma prototypes** and **course submission**: merges [Prompt.md](./local_docs/Prompt.md) (sections 2–4, 6), [REQUIREMENTS.md](./REQUIREMENTS.md), [CONTINUATION_CHECKLIST.md](./CONTINUATION_CHECKLIST.md), and the project proposal LaTeX sources ([sec-goals.tex](./Assignments/Project%20Proposal/Latex/sec-goals.tex), [sec-proposedUI.tex](./Assignments/Project%20Proposal/Latex/sec-proposedUI.tex), [sec-issues.tex](./Assignments/Project%20Proposal/Latex/sec-issues.tex)). API truth: [API.md](./API.md).
 
 ---
 

@@ -1,6 +1,6 @@
 # Requirements traceability matrix
 
-Maps **docs/REQUIREMENTS.md** functional requirements, **proposal** goals/UI (LaTeX `sec-goals.tex`, `sec-proposedUI.tex`), and selected **Prompt.md** / **CONTINUATION_CHECKLIST.md** themes to backend surfaces and implementation status.
+Maps **docs/REQUIREMENTS.md** functional requirements, **proposal** goals/UI (LaTeX `sec-goals.tex`, `sec-proposedUI.tex`), and selected themes from **docs/local_docs/Prompt.md** and **docs/CONTINUATION_CHECKLIST.md** to backend surfaces and implementation status.
 
 | ID | Requirement (summary) | Source | Backend today | Status | Notes / action |
 |----|------------------------|--------|---------------|--------|----------------|
