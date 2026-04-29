@@ -1,8 +1,12 @@
-https://www.recipetineats.com/asian-beef-bowls/#recipe
-https://www.recipetineats.com/chinese-beef-broccoli-noodles/#recipe
-https://www.recipetineats.com/lemon-garlic-salmon-tray-bake-easy-healthy/#recipe
-https://www.recipetineats.com/crispy-prawn-burgers/
-https://www.recipetineats.com/my-quickest-chinese-vegetable-soup-super-healthy/
-https://www.recipetineats.com/waffles-recipe/
-https://www.recipetineats.com/garlic-rice/
-https://www.recipetineats.com/carbonara/
+# Sample recipe source links
+
+These links are the source references used to shape the demo recipe set seeded by `backend/scripts/seed_demo.py`.
+
+- https://www.recipetineats.com/asian-beef-bowls/#recipe
+- https://www.recipetineats.com/chinese-beef-broccoli-noodles/#recipe
+- https://www.recipetineats.com/lemon-garlic-salmon-tray-bake-easy-healthy/#recipe
+- https://www.recipetineats.com/crispy-prawn-burgers/
+- https://www.recipetineats.com/my-quickest-chinese-vegetable-soup-super-healthy/
+- https://www.recipetineats.com/waffles-recipe/
+- https://www.recipetineats.com/garlic-rice/
+- https://www.recipetineats.com/carbonara/
