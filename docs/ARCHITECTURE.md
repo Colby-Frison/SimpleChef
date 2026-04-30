@@ -1,23 +1,24 @@
 # SimpleChef - System Architecture
 
+The repo ships **two** browser/mobile clients against one FastAPI backend. **`figma_design/`** is the primary web UI for the current course deliverable; **`frontend/`** at the repo root is a legacy **Expo** app that uses the same `/api/v1` contract.
+
 ```mermaid
 graph TB
-    subgraph Client["Frontend (Expo / React Native)"]
+    subgraph clients [Clients]
         direction TB
-        Router["Expo Router\n(File-based routing)"]
-        subgraph Screens["Screens"]
-            Auth["Auth\n(login / signup)"]
-            Tabs["Tab Navigator\n(Home · Calendar · Add · Grocery · Profile)"]
-            Recipe["Recipe Detail\n/recipe/[id]"]
-            Cooking["Cooking Mode\n/cooking/[id]"]
-            Manual["Manual Add\n/add/manual"]
+        subgraph web [figma_design Vite web]
+            ViteRouter["React Router\nsrc/app/routes.tsx"]
+            VitePages["Pages\nsrc/app/pages/"]
+            WebCtl["Controllers\nsrc/controllers/"]
+            WebApi["Axios\nsrc/lib/api.ts"]
+            WebZustand["Zustand\nauthStore · useTimerStore"]
         end
-        subgraph State["State & Data"]
-            Zustand["Zustand Stores\n(auth · timer)"]
-            ReactQuery["TanStack React Query\n(server state / caching)"]
-            Controllers["useXxxController hooks\n(orchestration)"]
+        subgraph expo [frontend Expo legacy]
+            ExpoRouter["Expo Router\napp/"]
+            ExpoCtl["Controllers\ncontrollers/"]
+            ExpoApi["Axios\nservices/api.ts"]
+            ExpoZustand["Zustand\nstore/"]
         end
-        API_Client["Axios API Client\n/api/v1  •  JWT bearer"]
     end
 
     subgraph Backend["Backend (FastAPI + Uvicorn, port 8000)"]
@@ -48,12 +49,15 @@ graph TB
         Alembic["Alembic Migrations"]
     end
 
-    Router --> Screens
-    Screens --> Controllers
-    Controllers --> ReactQuery
-    Controllers --> Zustand
-    ReactQuery --> API_Client
-    API_Client -->|"HTTPS / JSON"| Routes
+    ViteRouter --> VitePages
+    VitePages --> WebCtl
+    WebCtl --> WebApi
+    WebCtl --> WebZustand
+    ExpoRouter --> ExpoCtl
+    ExpoCtl --> ExpoApi
+    ExpoCtl --> ExpoZustand
+    WebApi -->|"HTTPS JSON /api/v1"| Routes
+    ExpoApi -->|"HTTPS JSON /api/v1"| Routes
     Routes --> Services
     Routes --> Security
     Routes --> Schemas
@@ -67,63 +71,64 @@ graph TB
 ## 1. Architectural Patterns
 The system follows a **Client-Server** architecture with a **Layered** approach to ensure high cohesion and low coupling.
 
-- **Frontend:** React Native (Expo) for cross-platform mobile/web support.
-- **Backend:** Python (FastAPI) for high performance and AI integration.
-- **Database:** PostgreSQL for structured relational data.
+- **Primary web client:** React + Vite (`figma_design/`), talks to FastAPI over JSON.
+- **Legacy mobile client:** React Native + Expo (`frontend/`), same API contract.
+- **Backend:** FastAPI + SQLAlchemy + Alembic.
+- **Database:** PostgreSQL (Docker Compose in dev).
 
 ## 2. Tech Stack
 
-### Frontend (Client)
-- **Framework:** React Native with Expo (Managed Workflow).
-- **Language:** TypeScript.
-- **State Management:** React Query (Server state) + Zustand or Context API (Client state/Timers).
-- **UI Component Library:** React Native Paper or Tamagui for responsive design.
-- **Navigation:** Expo Router / React Navigation.
+### Web client (`figma_design/`)
+- **React 18**, **TypeScript**, **Vite**, **React Router 7**.
+- **Axios** (`src/lib/api.ts`) with JWT on the `Authorization` header; **401** clears auth in the web store.
+- **Zustand** for auth token and cooking timers.
+- **UI:** app-local components under `src/app/components/` (incl. `ui/` primitives) plus page-level composition in `src/app/pages/`.
 
-### Backend (Server)
-- **Framework:** FastAPI (Python).
-- **ORM:** SQLAlchemy or Prisma (Python client) / SQLModel.
-- **Authentication:** OAuth2 with JWT (JSON Web Tokens).
-- **AI Integration:** OpenAI API / LangChain for recipe parsing.
+### Expo client (`frontend/`, legacy)
+- **Expo Router**, **React Native Paper**, **Axios** (`services/api.ts`), **Zustand** (`store/`).
+- **Controllers** (`controllers/`) mirror the web pattern: screens stay thin.
 
-### Infrastructure & DevOps
-- **Containerization:** Docker for backend and database.
-- **Storage:** AWS S3 (or compatible) for image/video storage.
+### Backend (`backend/`)
+- **FastAPI**, **SQLAlchemy** ORM, **Pydantic v2** schemas, **Alembic** migrations, **JWT** (python-jose) + **bcrypt** (passlib).
+- **Recipe parse:** demo `ai_service` + `recipe_parse_validation` — not a production LLM pipeline.
+
+### Infrastructure
+- **Docker Compose** for PostgreSQL (see repo `docker-compose.yml`).
+- **User media:** recipe `image_url` is a string field; no bundled object storage in this repo.
 
 ## 3. System Modules (Separation of Concerns)
 
-### 3.1. Frontend Modules
-- **`app/`**: Route handlers (Expo Router).
-- **`components/`**: Reusable UI components (Atoms, Molecules).
-- **`features/`**: Feature-specific logic (Cooking, Planning, Recipes).
-- **`services/`**: API clients and adapters.
-- **`store/`**: Global state management.
-- **`controllers/`**: Application-layer hooks (`use*Controller`) — load/save orchestration, validation, navigation callbacks; routes and feature views consume these instead of calling `services/api` directly.
-- **`types/`**: DTO-style TypeScript types aligned with FastAPI responses.
+### 3.1. Web frontend modules (`figma_design/src/`)
+- **`app/pages/`**: Route-level screens.
+- **`app/components/`**: Shared UI (including `CookingTimerDock`, `RecipeCard`, `ui/`).
+- **`controllers/`**: `use*WebController` hooks — data loading, forms, navigation side effects.
+- **`lib/`**: `api.ts` (Axios client), `dto.ts`, `authStore`, `useTimerStore`.
 
-### 3.2. Backend Modules
-- **`api/`**: Route controllers.
-- **`core/`**: Config, Security, Database connection.
-- **`models/`**: Database schemas (SQLAlchemy/Pydantic).
-- **`services/`**: Business logic.
-    - `AuthService`: User management.
-    - `RecipeService`: CRUD and AI parsing logic.
-    - `PlannerService`: Calendar and Meal tracking.
-    - `ShoppingService`: List generation and management.
-- **`schemas/`**: Pydantic models for request/response validation.
+### 3.2. Expo frontend modules (`frontend/`)
+- **`app/`**: Expo Router routes.
+- **`features/`**, **`components/`**: UI composition.
+- **`controllers/`**: `use*Controller` hooks (same layering idea as web).
+- **`services/api.ts`**, **`store/`**, **`types/`**.
 
-## 4. Data Flow
-1.  **Recipe Creation:** User uploads image -> Backend receives -> AI Service parses -> Returns draft -> User verifies -> Backend saves to DB.
-2.  **Meal Planning:** User adds recipe to date -> PlannerService updates `DailyPlan` -> Triggers `ShoppingService` to update `GroceryList`.
-3.  **Cooking:** Frontend manages Timer state locally (persisted if app backgrounded) -> Updates progress to Backend.
+### 3.3. Backend modules (`backend/app/`)
+- **`api/api_v1/endpoints/`**: FastAPI routers (`login`, `users`, `recipes`, `planner`, `grocery`).
+- **`crud/`**: Database access helpers (`crud_user`, `crud_recipe`, `crud_meal_plan`, etc.).
+- **`services/`**: Focused helpers (e.g. `grocery_from_plan`, `planner_summary`, `ai_service`, `recipe_parse_validation`) — not a separate “service class per domain” framework.
+- **`models/`**, **`schemas/`**, **`core/`** (settings, security), **`db/`** (session).
+
+## 4. Data Flow (as implemented)
+1. **Auth:** `POST /users/` registers; `POST /login/access-token` returns JWT; clients attach `Bearer` on subsequent calls.
+2. **Recipes:** CRUD via `/recipes/`; optional `POST /recipes/parse` returns a **draft** `RecipeCreate` from plain text (demo). Client edits and `POST /recipes/` to persist.
+3. **Planner:** Meals stored in `meal_plans`; grocery merge reads plans in a date range and aggregates ingredients — there is no automatic DB trigger from planner to grocery; merge is explicit (`POST /grocery/from-plan`).
+4. **Cooking:** Step index and timers are **client-side** (Zustand); the backend stores recipe shape (`steps`, `ingredient.step_id`).
 
 ## 5. ERD (Entity Relationship Diagram) Concept
-- **User** (1) <--> (N) **Recipe**
-- **User** (1) <--> (N) **MealPlan**
-- **MealPlan** (1) <--> (N) **Recipe**
-- **Recipe** (1) <--> (N) **Ingredient**
-- **User** (1) <--> (1) **GroceryList**
-- **GroceryList** (1) <--> (N) **GroceryItem**
+- **User** (1) → (N) **Recipe** (`created_by_id`)
+- **User** (1) → (N) **MealPlan**
+- **Recipe** (0..1) ← (N) **MealPlan** (optional `recipe_id`; many meals may reference the same recipe)
+- **Recipe** (1) → (N) **Ingredient**, (1) → (N) **Step**
+- **User** (1) → (1) **GroceryList**
+- **GroceryList** (1) → (N) **GroceryItem**
 
 ## 6. API authorization (ownership pattern)
 
@@ -150,7 +155,33 @@ All mutating endpoints must verify the authenticated user owns the resource (or 
 
 - `POST /grocery/from-plan` loads `MealPlan` rows for the user in `[start_date, end_date]` with a `recipe_id`, expands each recipe’s ingredients, aggregates by normalized `(name, unit)`, sums quantities, assigns a default category from keywords, then **merges** into the user’s `GroceryItem` rows (add quantity when the key exists, else insert). Manual-only lines are untouched unless they share the same normalized key.
 
-## 9. Frontend layering (Expo)
+## 9. Frontend layering
+
+### 9.1 Web (`figma_design/`)
+
+```mermaid
+flowchart TB
+  subgraph presentationWeb [Presentation]
+    Pages[src/app/pages]
+    Cmp[src/app/components]
+  end
+  subgraph applicationWeb [Controllers]
+    Hooks[src/controllers useXWebController]
+  end
+  subgraph dataWeb [Data]
+    Api[src/lib/api.ts]
+    Stores[src/lib authStore and useTimerStore]
+  end
+  Pages --> Hooks
+  Cmp --> Hooks
+  Hooks --> Api
+  Hooks --> Stores
+```
+
+- **Pages** stay mostly declarative; **controllers** own fetches, derived state, and navigation.
+- **Data** layer: Axios instance + Zustand for token and timers.
+
+### 9.2 Expo (`frontend/`)
 
 ```mermaid
 flowchart TB
@@ -171,7 +202,7 @@ flowchart TB
   Hooks --> Stores
 ```
 
-- **Presentation** (`app/`, `features/`): layout, Paper components, accessibility labels; no direct `recipeService` / `plannerService` calls in route files after the controller refactor.
+- **Presentation** (`app/`, `features/`): layout, Paper components, accessibility labels; routes call controllers rather than inlining all API logic.
 - **Application** (`controllers/`): per-screen state, debouncing, modals, and async actions.
 - **Data** (`services/api.ts`, `store/`): HTTP, auth header, 401 handling; global token and timers.
 

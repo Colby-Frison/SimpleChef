@@ -5,7 +5,7 @@ This folder contains project documentation used for implementation, course deliv
 ## Core project docs
 
 - `API.md`: backend endpoint behavior and API usage notes.
-- `ARCHITECTURE.md`: system architecture, module boundaries, and data flow.
+- `ARCHITECTURE.md`: system architecture, module boundaries, and data flow (FastAPI + **both** `figma_design` web and legacy `frontend` Expo).
 - `REQUIREMENTS.md`: system requirements specification.
 - `REQUIREMENTS_TRACEABILITY.md`: requirement-to-implementation mapping.
 - `FIGMA_UI_SYSTEM_REQUIREMENTS.md`: UI requirements and design alignment notes.
@@ -22,7 +22,3 @@ This folder contains project documentation used for implementation, course deliv
 - `Assignments/Term Project Report/instructions.md`
 - `Assignments/Project Proposal/Instructions.md`
 - `Assignments/Progress report/` (includes report instructions, diagrams, rough notes, and LaTeX files)
-
-## Local reference docs
-
-- `local_docs/Prompt.md`: local prompt/reference document retained for traceability.

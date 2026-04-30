@@ -1,13 +1,13 @@
 # Requirements traceability matrix
 
-Maps **docs/REQUIREMENTS.md** functional requirements, **proposal** goals/UI (LaTeX `sec-goals.tex`, `sec-proposedUI.tex`), and selected themes from **docs/local_docs/Prompt.md** and **docs/CONTINUATION_CHECKLIST.md** to backend surfaces and implementation status.
+Maps **docs/REQUIREMENTS.md** functional requirements, **proposal** goals/UI (LaTeX `sec-goals.tex`, `sec-proposedUI.tex`), and **docs/CONTINUATION_CHECKLIST.md** to backend surfaces and implementation status.
 
 | ID | Requirement (summary) | Source | Backend today | Status | Notes / action |
 |----|------------------------|--------|---------------|--------|----------------|
-| AUTH-1 | Sign up / login | SRS §2.1 | `POST /auth/register`, `POST /auth/login`, JWT | Met | — |
+| AUTH-1 | Sign up / login | SRS §2.1 | `POST /users/`, `POST /login/access-token`, JWT | Met | — |
 | PROF-1 | Dietary restrictions, calorie goal | SRS §2.1, Proposal goals | `PATCH /users/me`, `GET /users/me` | Met | Comma-separated / array on profile |
 | PROF-2 | Friends list | SRS §2.1, Proposal UI | — | Out of scope | Checklist: friends deferred |
-| PROF-3 | Screen always on | SRS §2.3, Prompt | `is_screen_always_on` on user | Met | Cooking respects pref |
+| PROF-3 | Screen always on | SRS section 2.3 | `is_screen_always_on` on user | Met | Cooking respects pref |
 | REC-1 | Recipe list search/filter | SRS §2.2, Proposal Home | `GET /recipes/` with `q`, `difficulty`, `tag`, `max_total_minutes`, `tags_all` | Partial | Home UI: search + difficulty; time/tags_all not exposed in UI yet |
 | REC-2 | Recipe detail, cooking entry | SRS §2.2 | `GET /recipes/{id}` | Met | 404 if not visible |
 | REC-3 | Parse text / manual / edit | SRS §2.2, Proposal | `POST /recipes/parse`, `POST`/`PUT /recipes/` | Partial | Demo parse; no real LLM; image/video deferred |
@@ -18,7 +18,7 @@ Maps **docs/REQUIREMENTS.md** functional requirements, **proposal** goals/UI (La
 | GROC-1 | Merge from plan, categories | SRS §2.5 | `POST /grocery/from-plan`, list `GET` | Met | Keyword categories |
 | GROC-2 | Inline edit / reorder | SRS §2.5, Proposal | `PUT /grocery/items/{id}` | Partial | Toggle + delete; no drag sort_order |
 | GROC-3 | Export / share | SRS §2.5 | `GET /grocery/export.txt` + client Share | Met | — |
-| NFR-1 | Cross-platform | SRS §3 | Expo | Met | — |
+| NFR-1 | Cross-platform | SRS §3 | Web (`figma_design`) + Expo (`frontend`) | Met | Primary UI is Vite web |
 | NFR-2 | Secure credentials | SRS §3 | JWT, HTTPS dev | Met | — |
 
 ### Proposal goals (`sec-goals.tex`) — rollup
@@ -38,11 +38,11 @@ Maps **docs/REQUIREMENTS.md** functional requirements, **proposal** goals/UI (La
 | Feature | UI status | Backend |
 |---------|-----------|---------|
 | Bottom nav (5 tabs) | Implemented | N/A |
-| Cooking replaces nav (Prompt) | Partial | N/A — still tab shell; Figma may show dedicated bar |
+| Cooking replaces nav | Partial | N/A — still tab shell; Figma may show dedicated bar |
 | Home grid + search | Implemented | `GET /recipes/` |
 | Filters (diet, time, difficulty) | Partial | Params exist; UI partial |
 | Recipe detail / cook | Implemented | As above |
-| Calendar dots + bottom panel | Partial | Plans API; dots not in current UI |
+| Calendar dots + bottom panel | Partial | Plans API; web UI shows meal-type dots (week/month); layout differs from proposal mockups |
 | Grocery editable/draggable | Partial | No persisted reorder |
 | Add image/video | Deferred | N/A |
 | Profile friends | Out of scope | N/A |

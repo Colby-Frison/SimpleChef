@@ -6,10 +6,12 @@ Interactive OpenAPI: `http://localhost:8000/docs`.
 
 ## Auth
 
-- `POST /login/access-token` — form body `username` (email), `password`. Returns JWT.
+- `POST /users/` — JSON body `UserCreate` (email, password, optional profile fields). **Public** registration; returns created user (no token). Clients typically call login next.
+- `POST /login/access-token` — OAuth2 form body `username` (email), `password`. Returns JWT (`access_token`, `token_type`).
+- Wrong email/password on login returns **400** (`Incorrect email or password`), not 401.
 - Send `Authorization: Bearer <token>` on protected routes.
 - Invalid/expired JWT returns **401** (`Could not validate credentials`).
-- Missing permission on a resource (e.g. editing someone else’s recipe) returns **403** without clearing the session on the client.
+- Missing permission on a resource (e.g. editing someone else’s recipe) returns **403** without clearing the session on the client (web client only clears session on **401**).
 
 ## Recipes
 
@@ -50,4 +52,5 @@ Ingredients may include `step_order_index` (matches `Step.order_index`) to link 
 
 ## Frontend integration
 
-- Set `EXPO_PUBLIC_API_URL` to the full API base including `/api/v1`.
+- **`figma_design/`:** set `VITE_API_URL` to the full API base including `/api/v1` (see project `README.md`).
+- **`frontend/` (Expo):** set `EXPO_PUBLIC_API_URL` the same way (full base with `/api/v1`).

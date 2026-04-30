@@ -27,11 +27,14 @@ SimpleChef is a cooking assistant that combines recipe management, step-by-step 
 - **Pydantic** for schema validation.
 - **JWT auth** + password hashing for authentication/security.
 
-### Frontend (`figma_design/`)
+### Frontend (`figma_design/`) — primary UI
 - **React** + **TypeScript** with **Vite**.
 - **React Router** for routing.
-- **TanStack Query** for server-state fetching/caching.
-- **Zustand** for client state (auth/timers).
+- **Axios** for HTTP (`src/lib/api.ts`); screen logic in **`src/controllers/`** hooks.
+- **Zustand** for client state (auth session, timers).
+
+### Frontend (`frontend/`) — legacy Expo
+- **React Native** + **Expo Router**, **React Native Paper**, **Axios** (`services/api.ts`), **Zustand** (`store/`). Same API base (`/api/v1`) as the web app.
 
 ## Setup and run
 
