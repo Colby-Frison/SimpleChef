@@ -1,13 +1,35 @@
-# SimpleChef
+<p align="center">
+  <img src="docs/assets/simplechef-logo.svg" alt="SimpleChef logo (chef hat on green circle, matching the sign-in page)" width="96" height="96">
+</p>
+
+<h1 align="center">SimpleChef</h1>
+
+<p align="center">
+  <img src="figs/splash.png" alt="SimpleChef splash banner" width="720">
+</p>
+
+<p align="center">
+  <a href="https://simple-chef.vercel.app"><strong>simple-chef.vercel.app</strong></a>
+</p>
 
 SimpleChef is a cooking assistant that combines recipe management, step-by-step cooking, meal planning, and grocery list generation in one system.
+
+This repository is an **academic course project** for **CS4063 Human–Computer Interaction** (Spring 2026). It is a prototype for learning and evaluation, not a commercial product or medical/nutritional advice.
+
+**Code review submission:** the course expects a **public** GitHub repository (or an uploaded archive) with a README that explains structure, components, libraries, and how to run the project; see `docs/Assignments/Code Review/instructions.md`. Use this repo’s URL plus the live demo link above when submitting.
 
 ## Repository overview
 
 - `backend/`: FastAPI service, database models, migrations, and seed scripts.
 - `figma_design/`: Primary frontend for this deliverable (React + Vite web app).
-- `frontend/`: Legacy Expo prototype (kept for reference).
+- `frontend/`: Legacy Expo prototype (kept for reference); optional run notes in `frontend/README.md`.
 - `docs/`: Architecture, API notes, requirements traceability, and assignment deliverables.
+- `figs/`: README and presentation screenshots (for example `splash.png`).
+
+### Module layout (for reviewers)
+
+- **Backend:** `backend/app/api/api_v1/endpoints/` (HTTP routes), `backend/app/crud/` (persistence helpers), `backend/app/models/` (SQLAlchemy), `backend/app/schemas/` (Pydantic), `backend/app/services/` (domain logic), `backend/app/core/` (config, security). Integration tests live under `backend/tests/`.
+- **Web app (`figma_design/`):** `src/app/` (routes and pages), `src/controllers/` (screen orchestration hooks), `src/lib/` (API client and shared utilities).
 
 ## Major components
 
@@ -120,12 +142,20 @@ Seed script creates a demo account:
 - Email: `demo@simplechef.local`
 - Password: `demo12345`
 
+## Screenshots
+
+Store presentation images in `figs/` (used in this README for the splash banner) or in `docs/assets/` next to the vector logo. Embed each with Markdown image syntax, for example `![Home screen](figs/home-screen.png)`.
+
 ## Known limitations
 
 - Recipe parsing is demo-only (no production LLM pipeline).
 - URL-only parse input is intentionally rejected.
 - Friends/social features are out of scope for this build.
 - `frontend/` is a legacy prototype and not the primary deliverable UI.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
 
 ## Documentation index
 

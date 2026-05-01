@@ -1,63 +1,53 @@
-﻿# Design Rationale
+﻿# Design Motivation / Problems in the Original UI
 
-**Requirements:** *explanation of major design decisions and how they improve usability, supported by relevant HCI principles*
+**Requirements:** *discussion of major usability issues in the original interface with annotated screenshots, or motivation and UX goals if the project involves a new interface*
 
-## Major design decisions
+## Context
 
-### 1) Controller-based frontend architecture (thin pages, logic in controllers)
+SimpleChef is a new interface rather than a direct redesign of one existing product. Therefore, this section focuses on major usability problems repeatedly observed in current cooking/planning workflows and explains the UX goals that guided our design.
 
-- Decision: Keep route/page components focused on rendering while moving orchestration (load/save, derived state, flow actions) into controller hooks.
-- Usability impact: Enables faster, safer iteration on behavior and reduces regressions in user-facing flows.
-- Relevant HCI principle: Consistency and reliability.
+## Main usability issues
 
-### 2) Step-first cooking mode with integrated timers
+1. Workflow fragmentation across multiple apps.
+   - Users often browse recipes in one app/site, plan meals in another tool, track calories elsewhere, and keep grocery lists separately.
+   - This causes repeated context switching and duplicated entry.
 
-- Decision: Center the cooking experience around one active step with timer actions in context and a dock for active timers.
-- Usability impact: Reduces cognitive overhead and context switching during high-attention tasks.
-- Relevant HCI principles: Recognition over recall, visibility of system status, cognitive load reduction.
+2. Recipe instructions are difficult to execute under real cooking conditions.
+   - Instructions are frequently long and dense instead of step-focused.
+   - Users must mentally extract sequence and timing while multitasking.
 
-### 3) Progressive disclosure across recipe and planning flows
+3. Timer management is disconnected from recipe flow.
+   - Timers are commonly external (phone clock/smart speaker/another app).
+   - Switching away from the recipe increases error risk and user stress.
 
-- Decision: Use expandable/collapsible sections and modal/detail patterns to avoid overloading screens.
-- Usability impact: Users complete core tasks without scanning irrelevant controls while preserving access to detail when needed.
-- Relevant HCI principles: Progressive disclosure, minimalist design, user control and freedom.
+4. Meal planning and grocery generation are weakly connected.
+   - Planned meals do not reliably convert into editable grocery lists.
+   - Users still perform manual ingredient aggregation and deduplication.
 
-### 4) Ownership-aware backend authorization patterns
+5. Recipe input/editing has high correction cost.
+   - Imported or parsed recipe content can be inconsistent.
+   - Many interfaces do not provide clear, fast verification/edit workflows.
 
-- Decision: Apply owner-scoped read/write logic and non-leaking not-found patterns where relevant.
-- Usability impact: Predictable access boundaries improve trust and prevent cross-user data exposure.
-- Relevant HCI principles: Error prevention, trust/safety.
+6. Health and preference settings are not integrated into routine flow.
+   - Calorie goals and dietary constraints are often standalone settings rather than active constraints during browse/plan/cook.
 
-### 5) Merge-from-plan grocery workflow with manual override
+## Motivation and UX goals
 
-- Decision: Provide automatic ingredient aggregation from planner data while preserving edit/check/delete control.
-- Usability impact: Automation reduces repetitive effort while editable results preserve user agency.
-- Relevant HCI principles: Smart defaults with full control, flexibility and efficiency of use.
+Based on these issues, we defined the following UX goals:
 
-### 6) Multi-path recipe creation (manual + parse-assisted)
+- Unify core tasks in one system: browse -> cook -> plan -> grocery without tool-hopping.
+- Prioritize execution clarity in cooking mode: one current step, visible progress, and integrated timer actions.
+- Support progressive disclosure: show only immediately relevant information while keeping full details available on demand.
+- Automate repetitive work with user control: merge from plan and smart defaults, but keep all entries editable.
+- Reduce correction friction in recipe creation: parse/import plus a manual verification path before save.
+- Integrate personal goals into daily flows: profile preferences should influence planning and decision-making.
 
-- Decision: Support manual entry and parse-assisted entry with verification/edit before persistence.
-- Usability impact: Accommodates different user preferences and confidence levels while limiting bad data.
-- Relevant HCI principles: Flexibility, recoverability, user control.
+## Evidence to include with this section
 
-### 7) Day-focused calendar planning and nutrition context
+For submission, pair this write-up with annotated screenshots from your prototype showing:
 
-- Decision: Emphasize actionable day-level meal and calorie context with quick-add and library-based additions.
-- Usability impact: Keeps planning lightweight for short sessions while still supporting structured meal logging.
-- Relevant HCI principles: Match between system and real-world tasks, efficiency of use.
-
-## Relevant HCI principles (summary)
-
-- Clarity over clutter.
-- Progressive disclosure.
-- Recognition over recall.
-- Error prevention and recovery.
-- User control and freedom.
-- Consistency across similar flows.
-
-## Mapping rationale to project goals
-
-- Calm, guided cooking -> step-wise flow + timer dock + focused content.
-- Unified workflow -> integrated routes/controllers/API across recipe/planner/grocery/profile.
-- Reduced manual overhead -> planner-to-grocery merge and parse-assisted recipe input.
-- Trust + control -> ownership-aware authorization and editable generated content.
+- Home/library -> Recipe detail -> Cooking mode (step + timer interactions)
+- Calendar day planning and calorie summary
+- Grocery merge/edit/export flow
+- Add/edit recipe verification path
+- Profile preferences tied to planning/cooking behavior

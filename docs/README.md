@@ -15,7 +15,7 @@ This folder contains project documentation used for implementation, course deliv
 
 ## Assignment docs
 
-- `Assignments/Code Review/instructions.md`
+- `Assignments/Code Review/instructions.md` — rubric for the code review: public repo or upload, README covering **structure**, **major components**, **frameworks/libraries**, and **run instructions**; graders also look for organization/readability, software engineering practices, and documentation that supports understanding the code. The root `README.md` is written to match those expectations.
 - `Assignments/Project Deliverable/instructions.md`
 - `Assignments/Project Presentation/presentation.md`
 - `Assignments/Project Presentation/outline.md`
